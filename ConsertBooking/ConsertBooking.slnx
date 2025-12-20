@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ConcertBooking.API/ConcertBooking.API.csproj" />
+  <Project Path="ConcertBooking.Mobile/ConcertBooking.Mobile.csproj" />
+  <Project Path="ConcertBooking.Shared/ConcertBooking.Shared.csproj" />
+</Solution>
