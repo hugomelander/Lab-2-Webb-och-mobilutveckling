@@ -1,5 +1,7 @@
 using ConcertBooking.API.Data;
 using Microsoft.EntityFrameworkCore;
+using ConcertBooking.API.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ var cs = builder.Configuration.GetConnectionString("DefaultConnection")
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(cs));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 var app = builder.Build();
 

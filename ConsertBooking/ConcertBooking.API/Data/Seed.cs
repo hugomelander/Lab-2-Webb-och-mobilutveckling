@@ -6,8 +6,15 @@ namespace ConcertBooking.API.Data
     {
         public static void SeedData(ApplicationDbContext db)
         {
+            Console.WriteLine(">>> SeedData() körs");
+
             if (db.Concerts.Any())
+            {
+                Console.WriteLine(">>> Seed hoppades över: Concerts finns redan");
                 return;
+            }
+
+            Console.WriteLine(">>> Seedar: lägger in konserter...");
 
             var concerts = new List<Concert>
             {
@@ -25,6 +32,7 @@ namespace ConcertBooking.API.Data
 
             db.Concerts.AddRange(concerts);
             db.SaveChanges();
+            Console.WriteLine(">>> Seed klar");
         }
     }
 }
