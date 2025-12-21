@@ -15,12 +15,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
-// Skapa DB + seed (Lab 1-stil)
+
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.EnsureCreated();
-    Seed.SeedData(db);   // ? nu pekar den på din klass
+    Seed.SeedData(db);   
 }
 
 if (app.Environment.IsDevelopment())
