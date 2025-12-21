@@ -1,17 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ConcertBooking.Mobile.Views;
 
-namespace ConcertBooking.Mobile
+namespace ConcertBooking.Mobile;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    public App(ConcertsPage page)
     {
-        public App()
-        {
-            InitializeComponent();
-        }
-
-        protected override Window CreateWindow(IActivationState? activationState)
-        {
-            return new Window(new AppShell());
-        }
+        InitializeComponent();
+        MainPage = new NavigationPage(page);
     }
 }

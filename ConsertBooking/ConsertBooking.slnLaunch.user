@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "ConcertBooking.API\\ConcertBooking.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "ConcertBooking.Mobile\\ConcertBooking.Mobile.csproj",
+        "Action": "Start",
+        "DebugTarget": "Windows Machine"
+      }
+    ]
+  }
+]
