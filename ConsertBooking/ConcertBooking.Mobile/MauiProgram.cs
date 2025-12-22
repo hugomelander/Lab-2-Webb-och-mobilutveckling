@@ -1,38 +1,49 @@
-﻿using Microsoft.Extensions.Logging;
-using ConcertBooking.Mobile.Services;
+﻿using ConcertBooking.Mobile.Services;
 using ConcertBooking.Mobile.ViewModels;
 using ConcertBooking.Mobile.Views;
+using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
 
+namespace ConcertBooking.Mobile;
 
-namespace ConcertBooking.Mobile
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+        var builder = MauiApp.CreateBuilder();
 
-#if DEBUG
-    		builder.Logging.AddDebug();
-            builder.Services.AddSingleton(new HttpClient
+        builder
+            .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
+            .ConfigureFonts(fonts =>
             {
-                BaseAddress = new Uri(ApiConfig.BaseUrl)
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-            builder.Services.AddSingleton<ConcertApi>();
-            builder.Services.AddSingleton<ConcertsViewModel>();
-            builder.Services.AddSingleton<ConcertsPage>();
-
+#if DEBUG
+        builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
-        }
+        // ----------- HttpClient -----------
+        builder.Services.AddSingleton(new HttpClient
+        {
+            BaseAddress = new Uri(ApiConfig.BaseUrl)
+        });
+
+        // ----------- Services -----------
+        builder.Services.AddSingleton<ConcertApi>();
+        builder.Services.AddSingleton<IDialogService, DialogService>();
+
+
+        // ----------- ViewModels -----------
+        builder.Services.AddSingleton<ConcertsViewModel>();
+        builder.Services.AddSingleton<PerformancesViewModel>();
+
+        // ----------- Views (Pages) -----------
+        builder.Services.AddSingleton<ConcertsPage>();
+        builder.Services.AddSingleton<PerformancesPage>();
+
+        return builder.Build();
     }
 }

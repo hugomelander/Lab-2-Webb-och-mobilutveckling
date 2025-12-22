@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text;
 using ConcertBooking.Mobile.Models;
 
 namespace ConcertBooking.Mobile.Services;
@@ -23,4 +24,32 @@ public class ConcertApi
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<ConcertDto>>(json, _jsonOptions) ?? new List<ConcertDto>();
     }
+    public async Task<List<PerformanceDto>> GetPerformancesAsync(int concertId)
+    {
+        var response = await _http.GetAsync($"/api/concerts/{concertId}/performances");
+        response.EnsureSuccessStatusCode();
+
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<List<PerformanceDto>>(json, _jsonOptions) ?? new List<PerformanceDto>();
+    }
+    public async Task<int> CreateBookingAsync(CreateBookingDto dto)
+    {
+        var json = JsonSerializer.Serialize(dto, _jsonOptions);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _http.PostAsync("/api/bookings", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // API returnerar booking-id i svaret (CreatedAtAction)
+            var body = await response.Content.ReadAsStringAsync();
+            using var doc = JsonDocument.Parse(body);
+            return doc.RootElement.GetProperty("id").GetInt32();
+        }
+
+        // Lägg feltext i exception (syns i UI)
+        var error = await response.Content.ReadAsStringAsync();
+        throw new Exception(error);
+    }
+
 }

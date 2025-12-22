@@ -1,39 +1,42 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using ConcertBooking.Mobile.Models;
 using ConcertBooking.Mobile.Services;
+using ConcertBooking.Mobile.Views;
+using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace ConcertBooking.Mobile.ViewModels;
 
-public class ConcertsViewModel : INotifyPropertyChanged
+public partial class ConcertsViewModel : ObservableObject
 {
     private readonly ConcertApi _api;
+    private readonly IServiceProvider _services;
+
+    private INavigation? _navigation;
 
     public ObservableCollection<ConcertDto> Concerts { get; } = new();
 
-    private bool _isBusy;
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set { _isBusy = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    private bool isBusy;
 
-    private string _errorMessage = "";
-    public string ErrorMessage
-    {
-        get => _errorMessage;
-        set { _errorMessage = value; OnPropertyChanged(); }
-    }
+    [ObservableProperty]
+    private string errorMessage = "";
 
-    public Command LoadCommand { get; }
+    [ObservableProperty]
+    private ConcertDto? selectedConcert;
 
-    public ConcertsViewModel(ConcertApi api)
+    public ConcertsViewModel(ConcertApi api, IServiceProvider services)
     {
         _api = api;
-        LoadCommand = new Command(async () => await LoadAsync());
+        _services = services;
     }
 
+    // sätts EN gång från sidan
+    public void SetNavigation(INavigation navigation)
+        => _navigation = navigation;
+
+    [RelayCommand]
     public async Task LoadAsync()
     {
         if (IsBusy) return;
@@ -59,7 +62,29 @@ public class ConcertsViewModel : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    // 🔥 triggas automatiskt när SelectedConcert ändras
+    partial void OnSelectedConcertChanged(ConcertDto? value)
+    {
+        if (value is not null)
+            _ = OpenPerformancesAsync(value);
+    }
+
+    private async Task OpenPerformancesAsync(ConcertDto concert)
+    {
+        try
+        {
+            if (_navigation is null) return;
+
+            var page = _services.GetRequiredService<PerformancesPage>();
+            await page.InitializeAsync(concert.Id);
+
+            await _navigation.PushAsync(page);
+        }
+        finally
+        {
+            // avmarkera så man kan klicka igen
+            SelectedConcert = null;
+        }
+    }
 }
+    

@@ -3,24 +3,52 @@
     x:Class="ConcertBooking.Mobile.Views.ConcertsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="Konserter">
+    Title="Föreställningar">
 
     <VerticalStackLayout Padding="16" Spacing="12">
 
-        <Button Text="Ladda konserter" Command="{Binding LoadCommand}" />
+        <!-- Loading -->
+        <ActivityIndicator
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}" />
 
-        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        <!-- Error -->
+        <Label
+            Text="{Binding ErrorMessage}"
+            TextColor="Red"
+            FontSize="14" />
 
-        <Label Text="{Binding ErrorMessage}" TextColor="Red" />
+        <!-- Performances list -->
+        <CollectionView
+            ItemsSource="{Binding Performances}"
+            SelectionMode="Single"
+            SelectedItem="{Binding SelectedPerformance, Mode=TwoWay}">
 
-        <CollectionView ItemsSource="{Binding Concerts}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="12" Margin="0,6">
+                    <Border
+                        Stroke="LightGray"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="12"
+                        Margin="0,6">
+
                         <VerticalStackLayout Spacing="6">
-                            <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="18" />
-                            <Label Text="{Binding Description}" FontSize="14" />
-                            <Label Text="{Binding BookingsCount, StringFormat='Bokningar: {0}'}" FontSize="12" />
+
+                            <Label
+                                Text="{Binding DateTime, StringFormat='{0:yyyy-MM-dd HH:mm}'}"
+                                FontSize="18"
+                                FontAttributes="Bold" />
+
+                            <Label
+                                Text="{Binding Location}"
+                                FontSize="14" />
+
+                            <Label
+                                Text="{Binding BookingsCount, StringFormat='Bokningar: {0}'}"
+                                FontSize="12"
+                                TextColor="Gray" />
+
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>
