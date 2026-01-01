@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ConcertBooking.Mobile.Models;
 using ConcertBooking.Mobile.Services;
 using ConcertBooking.Mobile.Views;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
 
 namespace ConcertBooking.Mobile.ViewModels;
 
@@ -12,6 +12,7 @@ public partial class ConcertsViewModel : ObservableObject
 {
     private readonly ConcertApi _api;
     private readonly IServiceProvider _services;
+    private readonly IDialogService _dialogs;
 
     private INavigation? _navigation;
 
@@ -26,13 +27,14 @@ public partial class ConcertsViewModel : ObservableObject
     [ObservableProperty]
     private ConcertDto? selectedConcert;
 
-    public ConcertsViewModel(ConcertApi api, IServiceProvider services)
+    // FIX 1: Lagt till IDialogService i konstruktorn
+    public ConcertsViewModel(ConcertApi api, IServiceProvider services, IDialogService dialogs)
     {
         _api = api;
         _services = services;
+        _dialogs = dialogs;
     }
 
-    // sätts EN gång från sidan
     public void SetNavigation(INavigation navigation)
         => _navigation = navigation;
 
@@ -62,7 +64,6 @@ public partial class ConcertsViewModel : ObservableObject
         }
     }
 
-    // 🔥 triggas automatiskt när SelectedConcert ändras
     partial void OnSelectedConcertChanged(ConcertDto? value)
     {
         if (value is not null)
@@ -82,9 +83,9 @@ public partial class ConcertsViewModel : ObservableObject
         }
         finally
         {
-            // avmarkera så man kan klicka igen
             SelectedConcert = null;
         }
     }
+
+
 }
-    

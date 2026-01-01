@@ -10,6 +10,6 @@ public class PerformanceDto
     public DateTime DateTime { get; set; }
     public string Location { get; set; } = "";
     public int ConcertId { get; set; }
-
+    public int BookingsCount { get; set; }
     public List<BookingDto> Bookings { get; set; } = new List<BookingDto>();
 }

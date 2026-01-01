@@ -51,5 +51,14 @@ public class ConcertApi
         var error = await response.Content.ReadAsStringAsync();
         throw new Exception(error);
     }
+    public async Task DeleteBookingAsync(int bookingId)
+    {
+        var response = await _http.DeleteAsync($"/api/Bookings/{bookingId}");
 
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Kunde inte avboka: {error}");
+        }
+    }
 }

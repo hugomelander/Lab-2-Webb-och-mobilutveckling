@@ -39,7 +39,6 @@ public class ConcertsController : ControllerBase
     [HttpGet("{concertId:int}/performances")]
     public async Task<IActionResult> GetPerformances(int concertId)
     {
-        // säkerställ att konserten finns
         var concert = await _uow.Concerts.GetByIdAsync(concertId);
         if (concert is null)
             return NotFound($"Concert with id {concertId} not found.");
@@ -52,7 +51,14 @@ public class ConcertsController : ControllerBase
             p.DateTime,
             p.Location,
             p.ConcertId,
-            BookingsCount = p.Bookings.Count
+            BookingsCount = p.Bookings.Count,
+            Bookings = p.Bookings.Select(b => new
+            {
+                b.Id,
+                b.Name,
+                b.Email,
+                b.PerformanceId
+            }).ToList()
         });
 
         return Ok(result);

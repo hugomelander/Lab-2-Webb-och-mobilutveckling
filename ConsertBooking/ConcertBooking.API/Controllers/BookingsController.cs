@@ -1,7 +1,6 @@
 ﻿using ConcertBooking.API.Models;
 using ConcertBooking.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
-
 namespace ConcertBooking.API.Controllers;
 
 [ApiController]
@@ -84,5 +83,31 @@ public class BookingsController : ControllerBase
         await _uow.SaveAsync();
 
         return NoContent();
+    }
+    [HttpGet("{concertId}/performances")]
+    public async Task<IActionResult> GetPerformances(int concertId)
+    {
+        // VIKTIGT: Du måste skicka med p => p.Bookings här!
+        var performances = await _uow.Performances.FindAsync(
+            p => p.ConcertId == concertId,
+            p => p.Bookings);
+
+        // Om du mappar till en DTO manuellt, se till att listan kopieras över:
+        var dtos = performances.Select(p => new PerformanceDto
+        {
+            Id = p.Id,
+            DateTime = p.DateTime,
+            Location = p.Location,
+            BookingsCount = p.Bookings.Count,
+            // DENNA RAD ÄR KRITISK:
+            Bookings = p.Bookings.Select(b => new BookingDto
+            {
+                Id = b.Id,
+                Name = b.Name,
+                Email = b.Email
+            }).ToList()
+        });
+
+        return Ok(dtos);
     }
 }

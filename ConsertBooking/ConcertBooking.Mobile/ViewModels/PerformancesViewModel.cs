@@ -103,4 +103,47 @@ public partial class PerformancesViewModel : ObservableObject
             IsBusy = false;
         }
     }
+    [RelayCommand]
+    public async Task CancelLatestBookingAsync(PerformanceDto performance)
+    {
+        if (performance.Bookings == null || !performance.Bookings.Any())
+        {
+            await _dialogs.AlertAsync("Info", "Det finns inga bokningar att ta bort.");
+            return;
+        }
+
+        var lastBooking = performance.Bookings.Last();
+
+        var inputEmail = await _dialogs.PromptAsync("Bekräfta avbokning",
+            $"Ange e-postadressen som användes för bokningen av {lastBooking.Name}:");
+
+        if (string.IsNullOrWhiteSpace(inputEmail)) return;
+
+        // 4. Kontrollera om e-posten matchar (case-insensitive)
+        if (inputEmail.Trim().ToLower() != lastBooking.Email.ToLower())
+        {
+            await _dialogs.AlertAsync("Fel", "E-postadressen matchar inte bokningen. Du kan bara avboka dina egna biljetter.");
+            return;
+        }
+
+        // 5. Om det matchar, kör avbokningen
+        try
+        {
+            IsBusy = true;
+            await _api.DeleteBookingAsync(lastBooking.Id);
+
+            await _dialogs.AlertAsync("Klart", "Bokningen har tagits bort.");
+
+            // Uppdatera listan så siffran minskar
+            await LoadAsync(ConcertId);
+        }
+        catch (Exception ex)
+        {
+            await _dialogs.AlertAsync("Fel", "Kunde inte avboka: " + ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 }
