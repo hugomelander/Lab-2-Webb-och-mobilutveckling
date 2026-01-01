@@ -17,4 +17,5 @@ public partial class PerformancesPage : ContentPage
     {
         await _vm.LoadAsync(concertId);
     }
+
 }

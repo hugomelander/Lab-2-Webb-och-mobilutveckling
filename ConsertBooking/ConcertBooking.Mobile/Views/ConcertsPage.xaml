@@ -19,36 +19,16 @@
             FontSize="14" />
 
         <!-- Performances list -->
-        <CollectionView
-            ItemsSource="{Binding Performances}"
-            SelectionMode="Single"
-            SelectedItem="{Binding SelectedPerformance, Mode=TwoWay}">
-
+        <CollectionView ItemsSource="{Binding Concerts}" 
+                SelectionMode="Single"
+                SelectedItem="{Binding SelectedConcert, Mode=TwoWay}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Border
-                        Stroke="LightGray"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 8"
-                        Padding="12"
-                        Margin="0,6">
-
+                    <Border Padding="12" Margin="0,6" BackgroundColor="Orange">
                         <VerticalStackLayout Spacing="6">
-
-                            <Label
-                                Text="{Binding DateTime, StringFormat='{0:yyyy-MM-dd HH:mm}'}"
-                                FontSize="18"
-                                FontAttributes="Bold" />
-
-                            <Label
-                                Text="{Binding Location}"
-                                FontSize="14" />
-
-                            <Label
-                                Text="{Binding BookingsCount, StringFormat='Bokningar: {0}'}"
-                                FontSize="12"
-                                TextColor="Gray" />
-
+                            <Label Text="{Binding Title}" FontSize="18" FontAttributes="Bold" />
+                            <Label Text="{Binding Description}" FontSize="14" />
+                            <Label Text="{Binding BookingsCount, StringFormat='Bokningar: {0}'}" FontSize="12" />
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>

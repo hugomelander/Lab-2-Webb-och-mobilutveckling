@@ -38,11 +38,11 @@ public static class MauiProgram
 
         // ----------- ViewModels -----------
         builder.Services.AddSingleton<ConcertsViewModel>();
-        builder.Services.AddSingleton<PerformancesViewModel>();
+        builder.Services.AddTransient<PerformancesViewModel>();
 
         // ----------- Views (Pages) -----------
         builder.Services.AddSingleton<ConcertsPage>();
-        builder.Services.AddSingleton<PerformancesPage>();
+        builder.Services.AddTransient<PerformancesPage>();
 
         return builder.Build();
     }

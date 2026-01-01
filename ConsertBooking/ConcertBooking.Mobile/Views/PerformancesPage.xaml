@@ -11,16 +11,30 @@
 
         <Label Text="{Binding ErrorMessage}" TextColor="Red" />
 
-        <CollectionView ItemsSource="{Binding Performances}">
+        <CollectionView 
+    ItemsSource="{Binding Performances}"
+    SelectionMode="Single"
+    SelectedItem="{Binding SelectedPerformance, Mode=TwoWay}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Padding="12" Margin="0,6">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup Name="CommonStates">
+                                <VisualState Name="Normal" />
+                                <VisualState Name="Selected">
+                                    <VisualState.Setters>
+                                        <Setter Property="BackgroundColor" Value="LightGray" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
                         <VerticalStackLayout Spacing="6">
                             <Label Text="{Binding DateTime, StringFormat='{0:yyyy-MM-dd HH:mm}'}"
-                                   FontAttributes="Bold" FontSize="18" />
+                           FontAttributes="Bold" FontSize="18" />
                             <Label Text="{Binding Location}" FontSize="14" />
                             <Label Text="{Binding BookingsCount, StringFormat='Bokningar: {0}'}"
-                                   FontSize="12" />
+                           FontSize="12" />
                         </VerticalStackLayout>
                     </Border>
                 </DataTemplate>

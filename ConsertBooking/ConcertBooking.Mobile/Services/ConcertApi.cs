@@ -16,7 +16,7 @@ public class ConcertApi
 
     public async Task<List<ConcertDto>> GetConcertsAsync()
     {
-        var url = "/api/concerts";
+        var url = "/api/Concerts";
         var response = await _http.GetAsync(url);
 
         response.EnsureSuccessStatusCode();
@@ -26,7 +26,7 @@ public class ConcertApi
     }
     public async Task<List<PerformanceDto>> GetPerformancesAsync(int concertId)
     {
-        var response = await _http.GetAsync($"/api/concerts/{concertId}/performances");
+        var response = await _http.GetAsync($"/api/Concerts/{concertId}/performances");
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
