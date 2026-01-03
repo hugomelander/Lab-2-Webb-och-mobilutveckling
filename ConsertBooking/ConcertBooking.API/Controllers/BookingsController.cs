@@ -139,4 +139,40 @@ public class BookingsController : ControllerBase
 
         return Ok(dtos);
     }
+    // GET: api/bookings/by-email?email=test@example.com
+    [HttpGet("by-email")]
+    public async Task<IActionResult> GetBookingsByEmail([FromQuery] string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return BadRequest("Email is required.");
+
+        var normalizedEmail = email.Trim().ToLower();
+
+        // Inkludera både Performance och tillhörande Concert
+        var bookings = await _uow.Bookings.FindAsync(
+            b => b.Email.ToLower() == normalizedEmail,
+            b => b.Performance,
+            b => b.Performance.Concert
+        );
+
+        if (!bookings.Any())
+            return NotFound("No bookings found for this email.");
+
+        var result = bookings.Select(b => new MyBookingDto
+        {
+            Id = b.Id,
+            Name = b.Name,
+            Email = b.Email,
+            Performance = new BookingPerformanceDto
+            {
+                Id = b.Performance!.Id,
+                DateTime = b.Performance.DateTime,
+                Location = b.Performance.Location,
+                ConcertId = b.Performance.ConcertId,
+                ConcertTitle = b.Performance.Concert?.Title ?? "Okänd konsert"
+            }
+        }).ToList();
+
+        return Ok(result);
+    }
 }

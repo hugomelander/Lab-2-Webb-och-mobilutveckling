@@ -13,7 +13,7 @@ public partial class ConcertsViewModel : ObservableObject
     private readonly ConcertApi _api;
     private readonly IServiceProvider _services;
     private readonly IDialogService _dialogs;
-
+    public ObservableCollection<MyBookingDto> MyBookings { get; } = new();
     private INavigation? _navigation;
 
     public ObservableCollection<ConcertDto> Concerts { get; } = new();
@@ -87,5 +87,55 @@ public partial class ConcertsViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    private async Task ShowMyBookingsAsync()
+    {
+        var email = await _dialogs.PromptAsync("Mina bokningar", "Ange din e-post:");
+        if (string.IsNullOrWhiteSpace(email)) return;
+
+        try
+        {
+            IsBusy = true;
+            var items = await _api.GetBookingsByEmailAsync(email.Trim());
+
+            MyBookings.Clear();
+            foreach (var b in items) MyBookings.Add(b);
+
+            if (!MyBookings.Any())
+                await _dialogs.AlertAsync("Info", "Inga bokningar hittades.");
+        }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
+        finally { IsBusy = false; }
+    }
+
+    [RelayCommand]
+    private async Task CancelBookingAsync(MyBookingDto booking)
+    {
+        if (booking == null) return;
+
+        try
+        {
+            // Använd din injicerade tjänst istället för Shell.Current
+            bool confirm = await _dialogs.ConfirmAsync("Avboka", "Vill du ta bort bokningen?", "Ja", "Nej");
+            if (!confirm) return;
+
+            IsBusy = true;
+
+            // Utför avbokningen via ID
+            await _api.DeleteBookingAsync(booking.Id);
+
+            // Uppdatera UI
+            MyBookings.Remove(booking);
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            await _dialogs.AlertAsync("Fel", ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
 
 }

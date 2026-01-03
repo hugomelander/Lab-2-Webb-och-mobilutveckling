@@ -18,15 +18,12 @@ public class DialogService : IDialogService
         await page.DisplayAlert(title, message, ok);
     }
 
-    public async Task<bool> ConfirmAsync(string title, string message)
+    public async Task<bool> ConfirmAsync(string title, string message, string ok = "Ja", string cancel = "Nej")
     {
-        var page = Application.Current?.MainPage;
-        if (page is null) return false;
+        var page = Application.Current?.Windows[0]?.Page;
 
-        return await page.DisplayAlert(
-            title,
-            message,
-            "Ja",
-            "Nej");
+        if (page == null) return false;
+
+        return await page.DisplayAlert(title, message, ok, cancel);
     }
 }

@@ -75,4 +75,23 @@ public class ConcertApi
         }
     }
 
+    public async Task<List<MyBookingDto>> GetBookingsByEmailAsync(string email)
+    {
+        var response = await _http.GetAsync(
+            $"api/bookings/by-email?email={Uri.EscapeDataString(email)}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Om API returnerar 404 (NotFound), hantera det snyggt
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return new List<MyBookingDto>();
+
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
+        }
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<List<MyBookingDto>>(json, _jsonOptions) ?? new List<MyBookingDto>();
+    }
 }
