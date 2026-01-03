@@ -26,7 +26,7 @@ public class BookingsController : ControllerBase
         if (performance is null)
             return NotFound($"Performance with id {dto.PerformanceId} not found.");
 
-        // (Valfritt men bra) undvik dublettbokning på samma performance + email
+        // undvik dublettbokning på samma performance + email
         var existing = await _uow.Bookings.FindAsync(b =>
             b.PerformanceId == dto.PerformanceId &&
             b.Email.ToLower() == dto.Email.ToLower());
@@ -44,7 +44,7 @@ public class BookingsController : ControllerBase
         await _uow.Bookings.AddAsync(booking);
         await _uow.SaveAsync();
 
-        // Returnera skapad bokning (minimalt)
+        // Returnera skapad bokning 
         return CreatedAtAction(nameof(GetBookingById), new { id = booking.Id }, new
         {
             booking.Id,
@@ -115,22 +115,20 @@ public class BookingsController : ControllerBase
         return NoContent();
     }
 
+    //hämta föreställningar för en konsert med bokningar
     [HttpGet("{concertId}/performances")]
     public async Task<IActionResult> GetPerformances(int concertId)
     {
-        // VIKTIGT: Du måste skicka med p => p.Bookings här!
         var performances = await _uow.Performances.FindAsync(
             p => p.ConcertId == concertId,
             p => p.Bookings);
 
-        // Om du mappar till en DTO manuellt, se till att listan kopieras över:
         var dtos = performances.Select(p => new PerformanceDto
         {
             Id = p.Id,
             DateTime = p.DateTime,
             Location = p.Location,
             BookingsCount = p.Bookings.Count,
-            // DENNA RAD ÄR KRITISK:
             Bookings = p.Bookings.Select(b => new BookingDto
             {
                 Id = b.Id,

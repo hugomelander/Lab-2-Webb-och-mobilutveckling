@@ -27,6 +27,28 @@ namespace ConcertBooking.API.Data
                         new() { DateTime = DateTime.Today.AddDays(7).AddHours(19), Location = "Stora Scenen" },
                         new() { DateTime = DateTime.Today.AddDays(8).AddHours(20), Location = "Stora Scenen" }
                     }
+                },
+
+                new()
+                {
+                    Title = "Jazz Night",
+                    Description = "En kväll med klassisk jazz.",
+                    Performances = new List<Performance>
+                    {
+                        new() { DateTime = DateTime.Today.AddDays(9).AddHours(19), Location = "Stora Scenen" },
+                        new() { DateTime = DateTime.Today.AddDays(10).AddHours(20), Location = "Stora Scenen" }
+                    }
+                },
+                                
+                new()
+                {
+                    Title = "Blues Night",
+                    Description = "En kväll med klassisk blues.",
+                    Performances = new List<Performance>
+                    {
+                        new() { DateTime = DateTime.Today.AddDays(11).AddHours(19), Location = "Stora Scenen" },
+                        new() { DateTime = DateTime.Today.AddDays(12).AddHours(20), Location = "Stora Scenen" }
+                    }
                 }
             };
 
