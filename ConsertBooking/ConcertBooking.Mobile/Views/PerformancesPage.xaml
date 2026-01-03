@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage
     x:Class="ConcertBooking.Mobile.Views.PerformancesPage"
+    x:Name="Page"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:viewModels="clr-namespace:ConcertBooking.Mobile.ViewModels"
@@ -9,16 +10,19 @@
 
     <VerticalStackLayout Padding="16" Spacing="12">
 
+        <!-- Laddningsindikator -->
         <ActivityIndicator 
             IsRunning="{Binding IsBusy}" 
             IsVisible="{Binding IsBusy}" 
             Color="Purple" />
 
+        <!-- Felmeddelande -->
         <Label 
             Text="{Binding ErrorMessage}" 
             TextColor="Red" 
             IsVisible="{Binding ErrorMessage.Length, Converter={StaticResource StringToBoolConverter}}" />
 
+        <!-- Lista med föreställningar -->
         <CollectionView 
             ItemsSource="{Binding Performances}"
             SelectionMode="Single"
@@ -26,18 +30,22 @@
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:PerformanceDto">
+
                     <SwipeView>
                         <SwipeView.RightItems>
                             <SwipeItems>
                                 <SwipeItem 
-                                    Text="Ångra bokning" 
-                                    BackgroundColor="Red" 
-                                    Command="{Binding Source={RelativeSource AncestorType={x:Type viewModels:PerformancesViewModel}}, Path=CancelLatestBookingCommand}"
+                                    Text="Ångra bokning"
+                                    BackgroundColor="Red"
+                                    Command="{Binding BindingContext.CancelBookingByEmailCommand, Source={x:Reference Page}}"
                                     CommandParameter="{Binding .}" />
                             </SwipeItems>
                         </SwipeView.RightItems>
 
-                        <Border Padding="12" Margin="0,6" StrokeShape="RoundRectangle 8">
+                        <Border Padding="12"
+                                Margin="0,6"
+                                StrokeShape="RoundRectangle 8">
+
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup Name="CommonStates">
                                     <VisualState Name="Normal" />
@@ -52,23 +60,26 @@
                             <VerticalStackLayout Spacing="6">
                                 <Label 
                                     Text="{Binding DateTime, StringFormat='{0:yyyy-MM-dd HH:mm}'}"
-                                    FontAttributes="Bold" 
+                                    FontAttributes="Bold"
                                     FontSize="18" />
 
                                 <Label 
-                                    Text="{Binding Location}" 
-                                    FontSize="14" 
+                                    Text="{Binding Location}"
+                                    FontSize="14"
                                     TextColor="DimGray" />
 
                                 <Label 
                                     Text="{Binding BookingsCount, StringFormat='Antal bokningar: {0}'}"
-                                    FontSize="12" 
+                                    FontSize="12"
                                     FontAttributes="Italic" />
                             </VerticalStackLayout>
+
                         </Border>
                     </SwipeView>
+
                 </DataTemplate>
             </CollectionView.ItemTemplate>
+
         </CollectionView>
 
     </VerticalStackLayout>

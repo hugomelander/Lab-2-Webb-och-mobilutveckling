@@ -104,42 +104,68 @@ public partial class PerformancesViewModel : ObservableObject
         }
     }
     [RelayCommand]
-    public async Task CancelLatestBookingAsync(PerformanceDto performance)
+    public async Task CancelBookingByEmail(PerformanceDto performance)
     {
+        if (performance == null) return;
+
         if (performance.Bookings == null || !performance.Bookings.Any())
         {
-            await _dialogs.AlertAsync("Info", "Det finns inga bokningar att ta bort.");
+            await _dialogs.AlertAsync("Info", "Det finns inga bokningar att ta bort för denna föreställning.");
             return;
         }
 
-        var lastBooking = performance.Bookings.Last();
+        // 1. Be användaren ange e-post
+        var inputEmail = await _dialogs.PromptAsync(
+            "Avboka biljetter",
+            "Ange e-postadressen som användes vid bokningen:");
 
-        var inputEmail = await _dialogs.PromptAsync("Bekräfta avbokning",
-            $"Ange e-postadressen som användes för bokningen av {lastBooking.Name}:");
+        if (string.IsNullOrWhiteSpace(inputEmail))
+            return;
 
-        if (string.IsNullOrWhiteSpace(inputEmail)) return;
+        var normalizedEmail = inputEmail.Trim().ToLower();
 
-        // 4. Kontrollera om e-posten matchar (case-insensitive)
-        if (inputEmail.Trim().ToLower() != lastBooking.Email.ToLower())
+        // 2. Kontrollera om det finns bokningar för JUST DENNA föreställning
+        var matchingBookings = performance.Bookings
+            .Where(b => b.Email.ToLower() == normalizedEmail)
+            .ToList();
+
+        if (!matchingBookings.Any())
         {
-            await _dialogs.AlertAsync("Fel", "E-postadressen matchar inte bokningen. Du kan bara avboka dina egna biljetter.");
+            await _dialogs.AlertAsync(
+                "Fel",
+                "Ingen bokning hittades för angiven e-postadress på just denna föreställning.");
             return;
         }
 
-        // 5. Om det matchar, kör avbokningen
+        // 3. Bekräftelse
+        var confirm = await _dialogs.ConfirmAsync(
+            "Bekräfta avbokning",
+            $"Vill du avboka {matchingBookings.Count} bokning(ar) för föreställningen den {performance.DateTime:yyyy-MM-dd HH:mm}?");
+
+        if (!confirm)
+            return;
+
         try
         {
             IsBusy = true;
-            await _api.DeleteBookingAsync(lastBooking.Id);
+            ErrorMessage = "";
 
-            await _dialogs.AlertAsync("Klart", "Bokningen har tagits bort.");
+            // 4. Anropa API:et med BÅDE e-post och PerformanceId
+            await _api.DeleteBookingsByEmailAsync(normalizedEmail, performance.Id);
 
-            // Uppdatera listan så siffran minskar
+            await _dialogs.AlertAsync(
+                "Klart",
+                $"Dina {matchingBookings.Count} bokningar för denna föreställning har tagits bort.");
+
+            // 5. Ladda om listan för att uppdatera BookingsCount och listan
             await LoadAsync(ConcertId);
         }
         catch (Exception ex)
         {
-            await _dialogs.AlertAsync("Fel", "Kunde inte avboka: " + ex.Message);
+            ErrorMessage = ex.Message;
+            await _dialogs.AlertAsync(
+                "Fel",
+                "Kunde inte avboka: " + ex.Message);
         }
         finally
         {

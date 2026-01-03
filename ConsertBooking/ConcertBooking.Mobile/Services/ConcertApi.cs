@@ -61,4 +61,18 @@ public class ConcertApi
             throw new Exception($"Kunde inte avboka: {error}");
         }
     }
+
+    public async Task DeleteBookingsByEmailAsync(string email, int performanceId)
+    {
+        var url = $"api/bookings/by-email?email={Uri.EscapeDataString(email)}&performanceId={performanceId}";
+
+        var response = await _http.DeleteAsync(url);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
+        }
+    }
+
 }

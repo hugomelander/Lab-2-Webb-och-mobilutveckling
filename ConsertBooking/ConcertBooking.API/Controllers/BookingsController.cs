@@ -84,6 +84,37 @@ public class BookingsController : ControllerBase
 
         return NoContent();
     }
+
+    // DELETE: api/bookings/by-email?email=test@example.com
+    [HttpDelete("by-email")]
+    public async Task<IActionResult> DeleteBookingsByEmail([FromQuery] string email, [FromQuery] int performanceId)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return BadRequest("Email is required.");
+
+        if (performanceId <= 0)
+            return BadRequest("A valid PerformanceId is required.");
+
+        var normalizedEmail = email.Trim().ToLower();
+
+        // Hämta bara bokningar som matchar BÅDE e-post OCH PerformanceId
+        var bookings = await _uow.Bookings.FindAsync(
+            b => b.Email.ToLower() == normalizedEmail && b.PerformanceId == performanceId
+        );
+
+        if (!bookings.Any())
+            return NotFound($"No bookings found for email {email} on this specific performance.");
+
+        foreach (var booking in bookings)
+        {
+            _uow.Bookings.Remove(booking);
+        }
+
+        await _uow.SaveAsync();
+
+        return NoContent();
+    }
+
     [HttpGet("{concertId}/performances")]
     public async Task<IActionResult> GetPerformances(int concertId)
     {
