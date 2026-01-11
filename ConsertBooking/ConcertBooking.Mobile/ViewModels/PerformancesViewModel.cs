@@ -114,7 +114,7 @@ public partial class PerformancesViewModel : ObservableObject
             return;
         }
 
-        // 1. Be användaren ange e-post
+        // Be användaren ange e-post
         var inputEmail = await _dialogs.PromptAsync(
             "Avboka biljetter",
             "Ange e-postadressen som användes vid bokningen:");
@@ -124,7 +124,7 @@ public partial class PerformancesViewModel : ObservableObject
 
         var normalizedEmail = inputEmail.Trim().ToLower();
 
-        // 2. Kontrollera om det finns bokningar för JUST DENNA föreställning
+        // Kontrollera om det finns bokningar för JUST DENNA föreställning
         var matchingBookings = performance.Bookings
             .Where(b => b.Email.ToLower() == normalizedEmail)
             .ToList();
@@ -137,7 +137,7 @@ public partial class PerformancesViewModel : ObservableObject
             return;
         }
 
-        // 3. Bekräftelse
+        //  Bekräftelse
         var confirm = await _dialogs.ConfirmAsync(
             "Bekräfta avbokning",
             $"Vill du avboka {matchingBookings.Count} bokning(ar) för föreställningen den {performance.DateTime:yyyy-MM-dd HH:mm}?");
@@ -150,14 +150,14 @@ public partial class PerformancesViewModel : ObservableObject
             IsBusy = true;
             ErrorMessage = "";
 
-            // 4. Anropa API:et med BÅDE e-post och PerformanceId
+            // Anropa API:et med BÅDE e-post och PerformanceId
             await _api.DeleteBookingsByEmailAsync(normalizedEmail, performance.Id);
 
             await _dialogs.AlertAsync(
                 "Klart",
                 $"Dina {matchingBookings.Count} bokningar för denna föreställning har tagits bort.");
 
-            // 5. Ladda om listan för att uppdatera BookingsCount och listan
+            // Laddar om listan för att uppdatera BookingsCount och listan
             await LoadAsync(ConcertId);
         }
         catch (Exception ex)

@@ -18,7 +18,7 @@ public class ConcertsController : ControllerBase
 
     // GET: api/concerts
     [HttpGet]
-    public async Task<IActionResult> GetConcerts()
+    public async Task<IActionResult> GetConcerts() //hämtar konserter med antal bokningar
     {
         var concerts = await _uow.GetConcertsWithBookingsAsync();
 

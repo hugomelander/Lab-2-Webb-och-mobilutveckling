@@ -11,10 +11,11 @@ public class BookingsController : ControllerBase
 
     public BookingsController(IUnitOfWork uow)
     {
-        _uow = uow;
+        _uow = uow; //unitofwork
     }
 
     // POST: api/bookings
+    //Skapa bokning
     [HttpPost]
     public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto)
     {
@@ -31,6 +32,7 @@ public class BookingsController : ControllerBase
             b.PerformanceId == dto.PerformanceId &&
             b.Email.ToLower() == dto.Email.ToLower());
 
+        //om det finns en sådan bokning, returnera konflikt
         if (existing.Count > 0)
             return Conflict("A booking with this email already exists for this performance.");
 
@@ -40,7 +42,7 @@ public class BookingsController : ControllerBase
             Name = dto.Name.Trim(),
             Email = dto.Email.Trim()
         };
-
+        // Spara bokning
         await _uow.Bookings.AddAsync(booking);
         await _uow.SaveAsync();
 
@@ -76,7 +78,7 @@ public class BookingsController : ControllerBase
     public async Task<IActionResult> DeleteBooking(int id)
     {
         var booking = await _uow.Bookings.GetByIdAsync(id);
-        if (booking is null)
+        if (booking is null) //om bokningen inte finns
             return NotFound($"Booking with id {id} not found.");
 
         _uow.Bookings.Remove(booking);
@@ -119,6 +121,7 @@ public class BookingsController : ControllerBase
     [HttpGet("{concertId}/performances")]
     public async Task<IActionResult> GetPerformances(int concertId)
     {
+        // Kontrollera om konserten finns
         var performances = await _uow.Performances.FindAsync(
             p => p.ConcertId == concertId,
             p => p.Bookings);
@@ -145,7 +148,7 @@ public class BookingsController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(email))
             return BadRequest("Email is required.");
-
+        // normalisera epost
         var normalizedEmail = email.Trim().ToLower();
 
         // Inkludera både Performance och tillhörande Concert
@@ -154,7 +157,7 @@ public class BookingsController : ControllerBase
             b => b.Performance,
             b => b.Performance.Concert
         );
-
+        //om inga bokningar finns för den eposten
         if (!bookings.Any())
             return NotFound("No bookings found for this email.");
 

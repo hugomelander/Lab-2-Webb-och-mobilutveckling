@@ -27,7 +27,6 @@ public partial class ConcertsViewModel : ObservableObject
     [ObservableProperty]
     private ConcertDto? selectedConcert;
 
-    // FIX 1: Lagt till IDialogService i konstruktorn
     public ConcertsViewModel(ConcertApi api, IServiceProvider services, IDialogService dialogs)
     {
         _api = api;
@@ -39,7 +38,7 @@ public partial class ConcertsViewModel : ObservableObject
         => _navigation = navigation;
 
     [RelayCommand]
-    public async Task LoadAsync()
+    public async Task LoadAsync() // Ladda konserter
     {
         if (IsBusy) return;
 
@@ -64,13 +63,13 @@ public partial class ConcertsViewModel : ObservableObject
         }
     }
 
-    partial void OnSelectedConcertChanged(ConcertDto? value)
+    partial void OnSelectedConcertChanged(ConcertDto? value) // Hantera val av konsert
     {
         if (value is not null)
             _ = OpenPerformancesAsync(value);
     }
 
-    private async Task OpenPerformancesAsync(ConcertDto concert)
+    private async Task OpenPerformancesAsync(ConcertDto concert) // Visa föreställningar för vald konsert
     {
         try
         {
@@ -86,8 +85,8 @@ public partial class ConcertsViewModel : ObservableObject
             SelectedConcert = null;
         }
     }
-
-    [RelayCommand]
+     
+    [RelayCommand] // Visa mina bokningar
     private async Task ShowMyBookingsAsync()
     {
         var email = await _dialogs.PromptAsync("Mina bokningar", "Ange din e-post:");
@@ -108,14 +107,14 @@ public partial class ConcertsViewModel : ObservableObject
         finally { IsBusy = false; }
     }
 
-    [RelayCommand]
+    [RelayCommand] // Avboka bokning
     private async Task CancelBookingAsync(MyBookingDto booking)
     {
         if (booking == null) return;
 
         try
         {
-            // Använd din injicerade tjänst istället för Shell.Current
+            // Bekräfta avbokning
             bool confirm = await _dialogs.ConfirmAsync("Avboka", "Vill du ta bort bokningen?", "Ja", "Nej");
             if (!confirm) return;
 

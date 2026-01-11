@@ -14,7 +14,7 @@ public class ConcertApi
         _http = http;
     }
 
-    public async Task<List<ConcertDto>> GetConcertsAsync()
+    public async Task<List<ConcertDto>> GetConcertsAsync() // metod för att hämta konserter
     {
         var url = "/api/Concerts";
         var response = await _http.GetAsync(url);
@@ -24,7 +24,7 @@ public class ConcertApi
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<ConcertDto>>(json, _jsonOptions) ?? new List<ConcertDto>();
     }
-    public async Task<List<PerformanceDto>> GetPerformancesAsync(int concertId)
+    public async Task<List<PerformanceDto>> GetPerformancesAsync(int concertId) // metod för att hämta föreställningar för en konsert
     {
         var response = await _http.GetAsync($"/api/Concerts/{concertId}/performances");
         response.EnsureSuccessStatusCode();
@@ -32,7 +32,7 @@ public class ConcertApi
         var json = await response.Content.ReadAsStringAsync();
         return JsonSerializer.Deserialize<List<PerformanceDto>>(json, _jsonOptions) ?? new List<PerformanceDto>();
     }
-    public async Task<int> CreateBookingAsync(CreateBookingDto dto)
+    public async Task<int> CreateBookingAsync(CreateBookingDto dto) // metod för att skapa bokning
     {
         var json = JsonSerializer.Serialize(dto, _jsonOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -51,7 +51,7 @@ public class ConcertApi
         var error = await response.Content.ReadAsStringAsync();
         throw new Exception(error);
     }
-    public async Task DeleteBookingAsync(int bookingId)
+    public async Task DeleteBookingAsync(int bookingId) // metod för att ta bort bokning baserat på boknings-ID
     {
         var response = await _http.DeleteAsync($"/api/Bookings/{bookingId}");
 
@@ -62,7 +62,7 @@ public class ConcertApi
         }
     }
 
-    public async Task DeleteBookingsByEmailAsync(string email, int performanceId)
+    public async Task DeleteBookingsByEmailAsync(string email, int performanceId) // metod för att ta bort bokningar baserat på e-post
     {
         var url = $"api/bookings/by-email?email={Uri.EscapeDataString(email)}&performanceId={performanceId}";
 
@@ -75,7 +75,7 @@ public class ConcertApi
         }
     }
 
-    public async Task<List<MyBookingDto>> GetBookingsByEmailAsync(string email)
+    public async Task<List<MyBookingDto>> GetBookingsByEmailAsync(string email) // metod för att hämta bokningar baserat på e-post
     {
         var response = await _http.GetAsync(
             $"api/bookings/by-email?email={Uri.EscapeDataString(email)}");
@@ -91,7 +91,7 @@ public class ConcertApi
         }
 
         var json = await response.Content.ReadAsStringAsync();
-
-        return JsonSerializer.Deserialize<List<MyBookingDto>>(json, _jsonOptions) ?? new List<MyBookingDto>();
+        
+        return JsonSerializer.Deserialize<List<MyBookingDto>>(json, _jsonOptions) ?? new List<MyBookingDto>(); // Returnera tom lista om deserialisering misslyckas
     }
 }
